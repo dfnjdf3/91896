@@ -1,129 +1,137 @@
-#import tkinter so we can make a GUI
-from tkinter import *
-from tkinter import messagebox
-from PIL import Image, ImageTk
+import tkinter as tk#Import tkinter for GUI components
+from tkinter import messagebox#Import message box for error messages
+from tkinter import ttk
+import random#Import random for generating random numbers
+from PIL import Image,ImageTk#Import PIL for image handling
 
-#quit subroutine
-def quit():
-    main_window.destroy()
-
-#print details of customers
-def print_shop_details ():
-    name_count = 0
-    #Create the column headings
-    Label(main_window, font=("Helvetica 10 bold"),text="Row").grid(column=0,row=7)
-    Label(main_window, font=("Helvetica 10 bold"),text="Customer Name").grid(column=1,row=7)
-    Label(main_window, font=("Helvetica 10 bold"),text="Receipt Number").grid(column=2,row=7)
-    Label(main_window, font=("Helvetica 10 bold"),text="Item Hired").grid(column=3,row=7)
-    Label(main_window, font=("Helvetica 10 bold"),text="Number Hired").grid(column=4,row=7)
-    #add each item in the list into its own row
-    while name_count < counters['total_entries'] :
-        Label(main_window, text=name_count).grid(column=0,row=name_count+8) 
-        Label(main_window, text=(shop_details[name_count][0])).grid(column=1,row=name_count+8)
-        Label(main_window, text=(shop_details[name_count][1])).grid(column=2,row=name_count+8)
-        Label(main_window, text=(shop_details[name_count][2])).grid(column=3,row=name_count+8)
-        Label(main_window, text=(shop_details[name_count][3])).grid(column=4,row=name_count+8)
-        name_count +=  1
-        counters['name_count'] = name_count
-        
-#Check the inputs are all valid
-def check_inputs ():
-    input_check = 0
-    Label(main_window, text="               ") .grid(column=2,row=0)
-    Label(main_window, text="               ") .grid(column=2,row=1)
-    Label(main_window, text="               ") .grid(column=2,row=2)
-    Label(main_window, text="               ") .grid(column=2,row=3)
-    customer=entry_customer.get()
-    if not customer.isalpha():
-        messagebox.showerror(title="Error", message="Please only enter your name" )
-        input_check = 1
-
-    receipt=entry_receipt.get()
-    if not receipt.isdigit():
-        messagebox.showerror(title="Error", message="Please only enter your receipt number" )
-        input_check = 1
-    #Check how many of the item the customer has hired	between 1 and 500 set, error text if blank  
-    if (entry_number_hired.get().isdigit()) : 
-        if  int(entry_number_hired.get()) < 1 or  int(entry_number_hired.get()) > 500:
-            messagebox.showerror(title="Error", message="Please only a quantity from 1-500" )
-            input_check = 1
-    else :
-        messagebox.showerror(title="Error", message="Please only a quantity from 1-500" )
-        input_check = 1
-    #Check that the item they have hired is not blank, set error text if blank     
-    hired=entry_hired.get()
-    if not hired.isalpha():
-        messagebox.showerror(title="Error", message="Please enter the item that have hired" )
-        input_check = 1
-    if input_check == 0 : append_name()
-
-#add the next customer to the list
-def append_name ():
-    #append each item to its own area of the list
-    shop_details.append([entry_customer.get(),entry_receipt.get(),entry_hired.get(),entry_number_hired.get()])
-    #clear the boxes
-    entry_customer.delete(0,'end')
-    entry_receipt.delete(0,'end')
-    entry_hired.delete(0,'end')
-    entry_number_hired.delete(0,'end')
-    counters['total_entries'] += 1
-
-#delete a row from the list
-def delete_row ():
-    #find which row is to be deleted and delete it
-    del shop_details[int(delete_item.get())]
-    counters['total_entries'] -= 1
-    name_count = counters['name_count']
-    delete_item.delete(0,'end')
-    #clear the last item displayed on the GUI
-    Label(main_window, text="       ").grid(column=0,row=name_count+7) 
-    Label(main_window, text="       ").grid(column=1,row=name_count+7)
-    Label(main_window, text="       ").grid(column=2,row=name_count+7)
-    Label(main_window, text="       ").grid(column=3,row=name_count+7)
-    Label(main_window, text="       ").grid(column=4,row=name_count+7)
-    #print all the items in the list
-    print_shop_details()
-
-#create the buttons and labels
-def setup_buttons():
-    # create all the empty and default labels, buttons and entry boxes. Put them in the correct grid location
-    Label(main_window, text="Customer Name").grid(column=0, row=0, sticky=E)
-    Label(main_window, text="Receipt Number").grid(column=0, row=1, sticky=E)
-    Button(main_window, text="Quit", command=main_window.quit, width=10).grid(column=4, row=0, sticky=E)
-    image = Image.open('Add.png')
-    image = image.resize((50, 50))
-    img = ImageTk.PhotoImage(image)
-    button = Button(main_window, text="Append Details", command=check_inputs, image=img, compound='left')
-    button.image = img 
-    button.grid(column=3, row=1)
-    Button(main_window, text="Print Details", command=print_shop_details, width=10).grid(column=4, row=1, sticky=E)
-    Label(main_window, text="Item Hired").grid(column=0, row=2, sticky=E)
-    Label(main_window, text="Number Hired").grid(column=0, row=3, sticky=E)
-    Label(main_window, text="Row #").grid(column=3, row=2, sticky=E)
-    Button(main_window, text="Delete Row", command=delete_row, width=10).grid(column=4, row=3, sticky=E)
-    Label(main_window, text="               ").grid(column=2, row=0)
-
-#start the program running
-def main():
-    #Start the GUI it up
-    main_window.title("Julies party pantry")
-    setup_buttons()
-    main_window.iconbitmap('favicon.ico')
-    main_window.mainloop()
+class JuilesApp:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("Julie's Party Pantry")#Set title of window
+        self.root.iconbitmap('favicon.ico')
+        self.details_list=[]#Initialize empty list to store details
+        self.total_count=0#Initialize count of entries
+        self.current_id=random.randint(100000,999999)#Generate random receipt ID
+        self.setup_ui()#Call method to setup user interface
+        self.root.geometry("1024x768")
     
-#create empty list for customer details and empty variable for entries in the list
-counters = {'total_entries':0,'name_count':0}
-shop_details = []    
-main_window =Tk() 
-main_window.geometry("600x400")   
-entry_customer = Entry(main_window)
-entry_customer.grid(column=1,row=0)
-entry_receipt = Entry(main_window)
-entry_receipt.grid(column=1,row=1)
-entry_hired = Entry(main_window)
-entry_hired.grid(column=1,row=2)
-entry_number_hired = Entry(main_window)
-entry_number_hired.grid(column=1,row=3)
-delete_item = Entry(main_window)
-delete_item .grid(column=3,row=3)    
-main()
+    def setup_ui(self):
+        #Set up the background image
+        bg_image=Image.open('pic8.png')#Open background image file
+        bg_image=bg_image.resize((self.root.winfo_screenwidth(),self.root.winfo_screenheight()))#Resize image to fit screen
+        self.bg_photo=ImageTk.PhotoImage(bg_image)#Convert image to PhotoImage
+        bg_label=tk.Label(self.root,image=self.bg_photo)#Create label to hold background image
+        bg_label.place(x=0,y=0,relwidth=1,relheight=1)#Place label at top left corner, stretch to fill window
+
+        # Create and place entry widgets
+        tk.Label(self.root,text="Customer Name").grid(column=0,row=0,sticky=tk.E)#Label for customer name
+        tk.Label(self.root,text="Item Hired").grid(column=0,row=1,sticky=tk.E)#Label for item hired
+        tk.Label(self.root,text="Quantity").grid(column=0,row=2,sticky=tk.E)#Label for quantity
+        tk.Label(self.root,text="Row #").grid(column=2,row=2,sticky=tk.E)#Label for row number
+
+        self.customer_entry=tk.Entry(self.root)#Entry widget for customer name
+        self.customer_entry.grid(column=1,row=0)#Place entry widget
+        self.hired_entry=tk.Entry(self.root)#Entry widget for item hired
+        self.hired_entry.grid(column=1,row=1)#Place entry widget
+        self.quantity_entry=ttk.Combobox(self.root,values=[str(i) for i in range(1, 501)]) 
+        self.quantity_entry.grid(column=1,row=2)#Place entry widget
+        self.quantity_entry.set("1")
+        self.row_entry=tk.Entry(self.root)#Entry widget for row number
+        self.row_entry.grid(column=2,row=3)#Place entry widget
+
+        #Create and place buttons with images
+        self.create_button("Append","pic1.png", self.validate_and_add).grid(column=2,row=1)
+        self.create_button("Print","pic2.png", self.show_details).grid(column=3,row=1)
+        self.create_button("Delete","pic3.png", self.remove_row).grid(column=3,row=3)
+        self.create_button("Quit","pic4.png", self.root.quit).grid(column=4,row=0)
+        self.create_button("Save Info","pic9.png", self.save_to_file).grid(column=4,row=1) 
+
+
+    def create_button(self, text,image_path,command):
+        image=Image.open(image_path)#Open image file
+        image=image.resize((30, 30))
+        photo=ImageTk.PhotoImage(image)
+        button=tk.Button(self.root,text=text,image=photo,compound='left',command=command)
+        button.photo=photo#Keep reference to image to prevent garbage collection
+        return button#Return created button
+
+    def validate_and_add(self):
+        #Validate input and add details if valid
+        if not self.customer_entry.get().isalpha():#Check if customer name is alphabetic
+            self.show_message("Customer Name must be letters only")#Show error message
+        elif not self.hired_entry.get().isalpha():#Check if item hired is alphabetic
+            self.show_message("Item Hired must be letters only")#Display error message
+        elif not self.quantity_entry.get().isdigit() or not 1<= int(self.quantity_entry.get())<= 500:#Check if quantity is number between 1 and 500
+            self.show_message("Quantity must be between 1 and 500")#Show error message
+        else:
+            self.add_entry()#Add entry to the list
+            self.clear_entries()#Clear input fields
+    
+    def show_message(self, message):
+        messagebox.showerror("Input Error",message)#Display error message in message box
+
+    def add_entry(self):
+        #Add new entry to details list
+        self.details_list.append([
+            self.customer_entry.get(),#Get customer name
+            self.current_id,#Use current receipt ID
+            self.hired_entry.get(),#Get item hired
+            self.quantity_entry.get()#Get quantity
+        ])
+        self.save_to_file()#Save to file
+        #Generate new random receipt ID
+        self.current_id=random.randint(100000,999999)
+        self.total_count+=1
+
+    def save_to_file(self):
+        #Save details list to file
+        with open("details.txt","w") as file:
+            for detail in self.details_list:
+                file.write(f"Customer Name: {detail[0]}, Receipt Number: {detail[1]}, Item Hired: {detail[2]}, Quantity: {detail[3]}\n")
+        print("Data has been saved successfully")
+
+    def clear_entries(self):
+        # Clear all entry fields
+        self.customer_entry.delete(0,'end')#Clear customer name entry
+        self.hired_entry.delete(0,'end')#Clear item hired entry
+        self.quantity_entry.set("1")#Reset quantity entry to default value
+
+    def show_details(self):
+        #Display all details in the GUI
+        for widget in self.root.grid_slaves():#Iterate over all widgets in grid
+            if int(widget.grid_info()["row"])>7:#Check if widget is in rows greater than 7
+                widget.grid_forget()#Hide widget
+
+        #Create and place headers for details table
+        tk.Label(self.root,text="Row",font=("Helvetica",10,"bold")).grid(column=0,row=7)
+        tk.Label(self.root,text="Customer Name",font=("Helvetica",10,"bold")).grid(column=1,row=7)
+        tk.Label(self.root,text="Receipt Number",font=("Helvetica",10,"bold")).grid(column=2,row=7)
+        tk.Label(self.root,text="Item Hired",font=("Helvetica",10,"bold")).grid(column=3,row=7)
+        tk.Label(self.root,text="Quantity",font=("Helvetica",10,"bold")).grid(column=4,row=7)
+
+        #Display each detail in the list
+        for i,detail in enumerate(self.details_list):
+            tk.Label(self.root,text=i).grid(column=0,row=i+8)  # Display row number
+            tk.Label(self.root,text=detail[0]).grid(column=1,row=i+8)#Display customer name
+            tk.Label(self.root,text=detail[1]).grid(column=2,row=i+8)#Display receipt number
+            tk.Label(self.root,text=detail[2]).grid(column=3,row=i+8)#Display item hired
+            tk.Label(self.root,text=detail[3]).grid(column=4,row=i+8)#Display quantity
+
+    def remove_row(self):
+        #Remove row based on row number provided
+        try:
+            index=int(self.row_entry.get())#Get index from entry field
+            if 0<=index<self.total_count:#Check if index is valid
+                del self.details_list[index]#Delete entry at given index
+                self.total_count-=1#Decrement total count
+                self.save_to_file()#Save updated list to file
+                self.show_details()#Update details display
+            else:
+                self.show_message("Invalid Row Number")#Show error message if index out of range
+        except ValueError:
+            self.show_message("Invalid Row Number")# Show error message if input not a number
+
+if __name__=="__main__":
+    root=tk.Tk()# Create the main window
+    app=JuilesApp(root)# Instantiate JuilesApp class
+    root.mainloop()# Run the application
