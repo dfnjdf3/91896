@@ -26,7 +26,35 @@ def print_shop_details ():
         counters['name_count'] = name_count
         
 #Check the inputs are all valid
+def check_inputs ():
+    input_check = 0
+    Label(main_window, text="               ") .grid(column=2,row=0)
+    Label(main_window, text="               ") .grid(column=2,row=1)
+    Label(main_window, text="               ") .grid(column=2,row=2)
+    Label(main_window, text="               ") .grid(column=2,row=3)
+    customer=entry_customer.get()
+    if not customer.isalpha():
+        messagebox.showerror(title="Error", message="Please only enter your name" )
+        input_check = 1
 
+    receipt=entry_receipt.get()
+    if not receipt.isdigit():
+        messagebox.showerror(title="Error", message="Please only enter your receipt number" )
+        input_check = 1
+    #Check how many of the item the customer has hired	between 1 and 500 set, error text if blank  
+    if (entry_number_hired.get().isdigit()) : 
+        if  int(entry_number_hired.get()) < 1 or  int(entry_number_hired.get()) > 500:
+            messagebox.showerror(title="Error", message="Please only a quantity from 1-500" )
+            input_check = 1
+    else :
+        messagebox.showerror(title="Error", message="Please only a quantity from 1-500" )
+        input_check = 1
+    #Check that the item they have hired is not blank, set error text if blank     
+    hired=entry_hired.get()
+    if not hired.isalpha():
+        messagebox.showerror(title="Error", message="Please enter the item that have hired" )
+        input_check = 1
+    if input_check == 0 : append_name()
 
 #add the next customer to the list
 def append_name ():
@@ -41,12 +69,14 @@ def append_name ():
 
 #delete a row from the list
 
+
 #create the buttons and labels
 def setup_buttons():
     #create all the empty and default labels, buttons and entry boxes. Put them in the correct grid location
     Label(main_window, text="Customer Name") .grid(column=0,row=0,sticky=E)
     Label(main_window, text="Receipt Number") .grid(column=0,row=1,sticky=E)
     Button(main_window, text="Quit",command=quit,width = 10) .grid(column=4, row=0,sticky=E)
+    Button(main_window, text="Append Details",command=check_inputs) .grid(column=3,row=1)
     Button(main_window, text="Print Details",command=print_shop_details,width = 10) .grid(column=4,row=1,sticky=E)
     Label(main_window, text="Item Hired") .grid(column=0,row=2,sticky=E)
     Label(main_window, text="Number Hired") .grid(column=0,row=3,sticky=E)
