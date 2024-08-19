@@ -1,6 +1,7 @@
 #import tkinter so we can make a GUI
 from tkinter import *
 from tkinter import messagebox
+from PIL import Image, ImageTk
 
 #quit subroutine
 def quit():
@@ -68,20 +69,39 @@ def append_name ():
     counters['total_entries'] += 1
 
 #delete a row from the list
-
+def delete_row ():
+    #find which row is to be deleted and delete it
+    del shop_details[int(delete_item.get())]
+    counters['total_entries'] -= 1
+    name_count = counters['name_count']
+    delete_item.delete(0,'end')
+    #clear the last item displayed on the GUI
+    Label(main_window, text="       ").grid(column=0,row=name_count+7) 
+    Label(main_window, text="       ").grid(column=1,row=name_count+7)
+    Label(main_window, text="       ").grid(column=2,row=name_count+7)
+    Label(main_window, text="       ").grid(column=3,row=name_count+7)
+    Label(main_window, text="       ").grid(column=4,row=name_count+7)
+    #print all the items in the list
+    print_shop_details()
 
 #create the buttons and labels
 def setup_buttons():
-    #create all the empty and default labels, buttons and entry boxes. Put them in the correct grid location
-    Label(main_window, text="Customer Name") .grid(column=0,row=0,sticky=E)
-    Label(main_window, text="Receipt Number") .grid(column=0,row=1,sticky=E)
-    Button(main_window, text="Quit",command=quit,width = 10) .grid(column=4, row=0,sticky=E)
-    Button(main_window, text="Append Details",command=check_inputs) .grid(column=3,row=1)
-    Button(main_window, text="Print Details",command=print_shop_details,width = 10) .grid(column=4,row=1,sticky=E)
-    Label(main_window, text="Item Hired") .grid(column=0,row=2,sticky=E)
-    Label(main_window, text="Number Hired") .grid(column=0,row=3,sticky=E)
-    Label(main_window, text="Row #") .grid(column=3,row=2,sticky=E)
-    Label(main_window, text="               ") .grid(column=2,row=0)
+    # create all the empty and default labels, buttons and entry boxes. Put them in the correct grid location
+    Label(main_window, text="Customer Name").grid(column=0, row=0, sticky=E)
+    Label(main_window, text="Receipt Number").grid(column=0, row=1, sticky=E)
+    Button(main_window, text="Quit", command=main_window.quit, width=10).grid(column=4, row=0, sticky=E)
+    image = Image.open('Add.png')
+    image = image.resize((50, 50))
+    img = ImageTk.PhotoImage(image)
+    button = Button(main_window, text="Append Details", command=check_inputs, image=img, compound='left')
+    button.image = img 
+    button.grid(column=3, row=1)
+    Button(main_window, text="Print Details", command=print_shop_details, width=10).grid(column=4, row=1, sticky=E)
+    Label(main_window, text="Item Hired").grid(column=0, row=2, sticky=E)
+    Label(main_window, text="Number Hired").grid(column=0, row=3, sticky=E)
+    Label(main_window, text="Row #").grid(column=3, row=2, sticky=E)
+    Button(main_window, text="Delete Row", command=delete_row, width=10).grid(column=4, row=3, sticky=E)
+    Label(main_window, text="               ").grid(column=2, row=0)
 
 #start the program running
 def main():
@@ -94,7 +114,8 @@ def main():
 #create empty list for customer details and empty variable for entries in the list
 counters = {'total_entries':0,'name_count':0}
 shop_details = []    
-main_window =Tk()    
+main_window =Tk() 
+main_window.geometry("600x400")   
 entry_customer = Entry(main_window)
 entry_customer.grid(column=1,row=0)
 entry_receipt = Entry(main_window)
