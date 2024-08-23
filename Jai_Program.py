@@ -1,14 +1,19 @@
+#Author: Jai Irudayarjan
+#Date: 17th May 2024
+#Purpose: To make a Ui for sort out pary pantry information using the tkinter standerd
+
+from tkinter import *
 import tkinter as tk#Import tkinter for GUI components
 from tkinter import messagebox#Import message box for error messages
 from tkinter import ttk
 import random#Import random for generating random numbers
 from PIL import Image,ImageTk#Import PIL for image handling
-
+import random
 class JuilesApp:
     def __init__(self,root):
         self.root=root
         self.root.title("Julie's Party Pantry")#Set title of window
-        self.root.iconbitmap('favicon.ico')
+        self.root.iconbitmap('favicon.ico')#Changes the defalt feather icon to custom icon
         self.details_list=[]#Initialize empty list to store details
         self.total_count=0#Initialize count of entries
         self.current_id=random.randint(100000,999999)#Generate random receipt ID
@@ -24,10 +29,10 @@ class JuilesApp:
         bg_label.place(x=0,y=0,relwidth=1,relheight=1)#Place label at top left corner, stretch to fill window
 
         # Create and place entry widgets
-        tk.Label(self.root,text="Customer Name").grid(column=0,row=0,sticky=tk.E)#Label for customer name
-        tk.Label(self.root,text="Item Hired").grid(column=0,row=1,sticky=tk.E)#Label for item hired
-        tk.Label(self.root,text="Quantity").grid(column=0,row=2,sticky=tk.E)#Label for quantity
-        tk.Label(self.root,text="Row #").grid(column=2,row=2,sticky=tk.E)#Label for row number
+        tk.Label(self.root,text="Customer Name", font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=0,row=0,sticky=tk.E)#Label for customer name
+        tk.Label(self.root,text="Item Hired", font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=0,row=1,sticky=tk.E)#Label for item hired
+        tk.Label(self.root,text="Quantity", font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=0,row=2,sticky=tk.E)#Label for quantity
+        tk.Label(self.root,text="Row #", font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=2,row=2,sticky=tk.E)#Label for row number
 
         self.customer_entry=tk.Entry(self.root)#Entry widget for customer name
         self.customer_entry.grid(column=1,row=0)#Place entry widget
@@ -40,32 +45,37 @@ class JuilesApp:
         self.row_entry.grid(column=2,row=3)#Place entry widget
 
         #Create and place buttons with images
-        self.create_button("Append","pic1.png", self.validate_and_add).grid(column=2,row=1)
-        self.create_button("Print","pic2.png", self.show_details).grid(column=3,row=1)
-        self.create_button("Delete","pic3.png", self.remove_row).grid(column=3,row=3)
-        self.create_button("Quit","pic4.png", self.root.quit).grid(column=4,row=0)
-        self.create_button("Save Info","pic9.png", self.save_to_file).grid(column=4,row=1) 
+        self.create_button("Append","pic1.png",self.validate_and_add, font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=2,row=1)
+        self.create_button("Print","pic2.png", self.show_details, font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=3,row=1)
+        self.create_button("Delete row","pic3.png", self.remove_row, font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=3,row=3)
+        self.create_button("Quit","pic4.png",self.root.quit, font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=4,row=0)
+        self.create_button("Save Info","pic9.png", self.save_to_file, font=("SpaceGrotesk-Bold",12,"bold", "italic")).grid(column=4,row=1) 
 
 
-    def create_button(self, text,image_path,command):
+    def create_button(self, text,image_path,command, font=("Helveltica", 12)):
         image=Image.open(image_path)#Open image file
         image=image.resize((30, 30))
         photo=ImageTk.PhotoImage(image)
-        button=tk.Button(self.root,text=text,image=photo,compound='left',command=command)
+        button=tk.Button(self.root,text=text,image=photo,compound='left',command=command, font=font)
         button.photo=photo#Keep reference to image to prevent garbage collection
         return button#Return created button
+     
+    def validate_and_add(self):# creats a error control
 
-    def validate_and_add(self):
-        #Validate input and add details if valid
-        if not self.customer_entry.get().isalpha():#Check if customer name is alphabetic
-            self.show_message("Customer Name must be letters only")#Show error message
-        elif not self.hired_entry.get().isalpha():#Check if item hired is alphabetic
-            self.show_message("Item Hired must be letters only")#Display error message
-        elif not self.quantity_entry.get().isdigit() or not 1<= int(self.quantity_entry.get())<= 500:#Check if quantity is number between 1 and 500
-            self.show_message("Quantity must be between 1 and 500")#Show error message
+        allowed_chars=set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ")#make's sure if the customer only enters the alpha bets and space
+        customer_name=self.customer_entry.get()#gets customer information
+        item_hired=self.hired_entry.get()#gets item hired information
+        quantity=self.quantity_entry.get()#gets how much the customer bought
+        
+        if not customer_name or not item_hired or not quantity:#check if customer name, item hired and quantity is filled in
+            messagebox.showerror("Error", "Please fill in all fields")#shows message box if all entry fields are not entered
+        elif not set(customer_name).issubset(allowed_chars) or not set(item_hired).issubset(allowed_chars):#makes sure that the customer only enters alpahabets and spaces
+            messagebox.showerror("Error", "Enter a your name and item hired please")#shows if the customer entered special characters, numbers in special entery fields.
+        elif not quantity.isdigit() or not 1<int(quantity)<500:#makes sure that customer enters a quantity between 1 and 500 if. If chosen as 1 gives a error or if chosen as 500 also gives an error
+            messagebox.showerror("Error", "Quantity must be a number between 1 and 500")#Shows if the user choosed a number under 1(but can't) or 1 it self or if they choosed over 500(but can't) or 500 itself. This is because i made combobox
         else:
-            self.add_entry()#Add entry to the list
-            self.clear_entries()#Clear input fields
+            self.add_entry()#Adds entries to the receipt
+            self.clear_entries()#Deletes entries in the receipt
     
     def show_message(self, message):
         messagebox.showerror("Input Error",message)#Display error message in message box
@@ -101,21 +111,23 @@ class JuilesApp:
         for widget in self.root.grid_slaves():#Iterate over all widgets in grid
             if int(widget.grid_info()["row"])>7:#Check if widget is in rows greater than 7
                 widget.grid_forget()#Hide widget
-
+        
+        Font_header=("SpaceGrotesk-Bold",12,"bold", "italic")
         #Create and place headers for details table
-        tk.Label(self.root,text="Row",font=("Helvetica",10,"bold")).grid(column=0,row=7)
-        tk.Label(self.root,text="Customer Name",font=("Helvetica",10,"bold")).grid(column=1,row=7)
-        tk.Label(self.root,text="Receipt Number",font=("Helvetica",10,"bold")).grid(column=2,row=7)
-        tk.Label(self.root,text="Item Hired",font=("Helvetica",10,"bold")).grid(column=3,row=7)
-        tk.Label(self.root,text="Quantity",font=("Helvetica",10,"bold")).grid(column=4,row=7)
+        tk.Label(self.root,text="Row",font=Font_header).grid(column=0,row=7)
+        tk.Label(self.root,text="Customer Name",font=Font_header).grid(column=1,row=7)
+        tk.Label(self.root,text="Receipt Number",font=Font_header).grid(column=2,row=7)
+        tk.Label(self.root,text="Item Hired",font=Font_header).grid(column=3,row=7)
+        tk.Label(self.root,text="Quantity",font=Font_header).grid(column=4,row=7)
 
         #Display each detail in the list
+        detail_font=("SpaceGrotesk-Bold",12,"bold")
         for i,detail in enumerate(self.details_list):
-            tk.Label(self.root,text=i).grid(column=0,row=i+8)  # Display row number
-            tk.Label(self.root,text=detail[0]).grid(column=1,row=i+8)#Display customer name
-            tk.Label(self.root,text=detail[1]).grid(column=2,row=i+8)#Display receipt number
-            tk.Label(self.root,text=detail[2]).grid(column=3,row=i+8)#Display item hired
-            tk.Label(self.root,text=detail[3]).grid(column=4,row=i+8)#Display quantity
+            tk.Label(self.root,text=i,font=detail_font).grid(column=0,row=i+8)  # Display row number
+            tk.Label(self.root,text=detail[0],font=detail_font).grid(column=1,row=i+8)#Display customer name
+            tk.Label(self.root,text=detail[1],font=detail_font).grid(column=2,row=i+8)#Display receipt number
+            tk.Label(self.root,text=detail[2],font=detail_font).grid(column=3,row=i+8)#Display item hired
+            tk.Label(self.root,text=detail[3],font=detail_font).grid(column=4,row=i+8)#Display quantity
 
     def remove_row(self):
         #Remove row based on row number provided
